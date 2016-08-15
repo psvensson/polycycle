@@ -1,0 +1,34 @@
+<link rel="import" href="../polymer/polymer.html">
+
+<!--
+`polymer-spincycle`
+client and web components to communicate with and display lists and editors for any spincycle models
+
+@demo demo/index.html 
+-->
+
+<dom-module id="polymer-spincycle">
+  <template>
+    <style>
+      :host {
+        display: block;
+      }
+    </style>
+    <h2>Hello [[prop1]]</h2>
+  </template>
+
+  <script>
+    Polymer({
+
+      is: 'polymer-spincycle',
+
+      properties: {
+        prop1: {
+          type: String,
+          value: 'polymer-spincycle',
+        },
+      },
+
+    });
+  </script>
+</dom-module>

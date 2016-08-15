@@ -1,0 +1,132 @@
+
+<link rel="import" href="./bower_components/polymer/polymer.html">
+<link rel="import" href="./bower_components/paper-listbox/paper-listbox.html">
+<link rel="import" href="./bower_components/paper-item/paper-item.html">
+<link rel="import" href="./bower_components/iron-icons/maps-icons.html">
+<link rel="import" href="./bower_components/iron-icons/iron-icons.html">
+
+
+<dom-module id="spin-list">
+
+    <template>
+
+        <style>
+
+        </style>
+
+        <div>
+            <h4>List of {{spinitems.length}} {{model}}s</h4>
+            <paper-listbox>
+                <template id="listtemplate" is="dom-repeat" items="{{spinitems}}">
+                    <div style="display:flex; flex-direction:row" >
+                        <template is="dom-if" if="{{delete}}">
+                            <iron-icon style="margin-top: 10px" icon="icons:delete" on-tap="onDelete" item="{{item}}"></iron-icon>
+                        </template>
+                        <paper-item  raised on-tap="onSelect">{{item.name}}</paper-item>
+                    </div>
+                </template>
+            </paper-listbox>
+        </div>
+    </template>
+
+    <script>
+        Polymer({
+            is: 'spin-list',
+            properties:
+            {
+                client:{type:'Object', notify: true},
+                model:          {type: 'String'},
+                propname:          {type: 'String'},
+                delete:         {type: 'Boolean'},
+                spinitems:
+                {
+                    type: 'Array',
+                    value: function()
+                    {
+                        return [];
+                    },
+                    observer: 'onItemsChange'
+                },
+                incallbacks:    {type: 'Object'}
+            },
+
+            ready: function()
+            {
+                console.log('*** spin-list ready. model = '+this.model)
+            },
+
+            attached: function()
+            {
+                this.listeners = {}
+            },
+
+            onItemsChange: function(newitems)
+            {
+                console.log('spin-list onItemChanged for "'+this.model+'"')
+                console.dir(arguments)
+
+                //this.set('spinitems', newitems)
+                //this.notifyPath('spinitems',this.spinitems)
+
+                if(newitems)
+                {
+                    newitems.forEach(function(item)
+                    {
+                        //this.push('spinitems', item)
+                        if(!this.listeners[item.id])
+                        {
+                            this.listeners[item.id] = item
+                            console.log('** spin-list for "'+this.model+'" registering for object change callback from server for '+item.name+' '+item.id)
+                            this.client.registerObjectSubscriber({ id: item.id, type: item.type, cb: function(newobj)
+                            {
+                                if(this.spinitems)
+                                {
+                                    console.log('#################### spin-list object change callback for ' + newobj.id)
+                                    console.dir(arguments)
+
+                                    for(var i = 0; i < this.spinitems.length; i++)
+                                    {
+                                        var ii = this.spinitems[i]
+                                        //console.log('comparing '+ii.id+' - '+newobj.id)
+                                        if(ii.id == newobj.id)
+                                        {
+                                            console.log('setting spinitem '+i)
+                                            this.set('spinitems.'+i+'', newobj)
+                                        }
+                                    }
+                                }
+                            }.bind(this)})
+                        }
+                        //this.$.listtemplate.render()
+                        //this.notifyPath('listitems',this.listitems)
+
+                    }.bind(this))
+                }
+
+            },
+
+            onSelect: function(e)
+            {
+                //console.log('onSelect called at spin-list')
+                var item = e.model.item
+                if(this.incallbacks && this.incallbacks.onSelect)
+                {
+                    this.incallbacks.onSelect(item)
+                }
+            },
+
+            onDelete:function(e)
+            {
+                console.log('onDelete called at spin-list')
+                console.dir(e)
+                var item = e.model.item
+                if(this.incallbacks && this.incallbacks.onDelete)
+                {
+                    this.incallbacks.onDelete(item, this.propname)
+                }
+            },
+        });
+
+    </script>
+
+</dom-module>
