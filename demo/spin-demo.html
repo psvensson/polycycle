@@ -1,0 +1,25 @@
+
+<link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="../spin-alltypes.html">
+<link rel="import" href="../spin-client.html">
+
+<dom-module id="spin-demo">
+
+    <template>
+        <spin-client client="{{client}}" user="{{user}}"></spin-client>
+        <spin-alltypes client="{{client}}"></spin-alltypes>
+    </template>
+
+    <script>
+        Polymer({
+            is: 'spin-demo',
+            properties:
+            {
+                client:{type:'Object', notify: true},
+                user:{type:'Object', notify: true}
+            }
+        });
+
+    </script>
+
+</dom-module>
