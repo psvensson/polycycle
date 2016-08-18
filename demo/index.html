@@ -9,25 +9,18 @@
     <link rel="import" href="../bower_components/iron-demo-helpers/demo-pages-shared-styles.html">
     <link rel="import" href="../bower_components/iron-demo-helpers/demo-snippet.html">
 
-    <link rel="import" href="../spin-client.html">
-    <link rel="import" href="../spin-alltypes.html">
+    <link rel="import" href="./spin-demo.html">
 
     <style is="custom-style" include="demo-pages-shared-styles">
     </style>
   </head>
   <body>
 
-  <script>
-    var client = new window.SpinClient()
-    console.dir(spinpolymer)
-  </script>
-
     <div class="vertical-section-container centered">
       <h3>Basic polymer-spincycle Demo</h3>
       <demo-snippet>
         <template>
-          <spin-client client="{{client}}" user="{{user}}"></spin-client>
-          <spin-alltypes client="{{client}}"></spin-alltypes>
+          <spin-demo></spin-demo>
         </template>
       </demo-snippet>
     </div>

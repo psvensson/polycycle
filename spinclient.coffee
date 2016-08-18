@@ -13,7 +13,7 @@ uuid = UUID4
 
 class spinpolymer
 
-  constructor: (dbUrl) ->
+  constructor: (@dbUrl) ->
     @open = false
     @subscribers = {}
     @objsubscribers = []
@@ -33,7 +33,7 @@ class spinpolymer
 
     @savedMessagesInCaseOfRetries = new LRUCache({max:1000, maxAgeInMilliseconds: 5000})
 
-    if debug then console.log 'polymer-spincycle dbUrl = ' + dbUrl
+    if debug then console.log 'polymer-spincycle dbUrl = ' + @dbUrl
 
     @subscribers['OBJECT_UPDATE'] = [(obj) =>
       console.log 'spinpolymer +++++++++ obj update message router got obj '+obj.id+' of type '+obj.type
@@ -88,7 +88,7 @@ class spinpolymer
 
   setup: () =>
 
-    @socket = io(@dbUrl)
+    @socket = io(@dbUrl, {source:@dbUrl})
     @socket.on 'connect', ()=>
       @emit({target:'listcommands'})
 

@@ -53,7 +53,8 @@
 
             attached: function()
                       {
-                          window.spinclient = new window.SpinClient()
+                          console.log('spin-client attached')
+                          window.spinclient = new window.SpinClient('/')
                           console.log('spin-client attached.')
                           this.set('client', window.spinclient)
                           this.client.setUser = this.onUserChanged.bind( this )

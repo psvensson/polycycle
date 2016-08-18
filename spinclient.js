@@ -16,6 +16,7 @@
 
   spinpolymer = (function() {
     function spinpolymer(dbUrl) {
+      this.dbUrl = dbUrl;
       this.flattenModel = bind(this.flattenModel, this);
       this.listTargets = bind(this.listTargets, this);
       this.getModelFor = bind(this.getModelFor, this);
@@ -51,7 +52,7 @@
         maxAgeInMilliseconds: 5000
       });
       if (debug) {
-        console.log('polymer-spincycle dbUrl = ' + dbUrl);
+        console.log('polymer-spincycle dbUrl = ' + this.dbUrl);
       }
       this.subscribers['OBJECT_UPDATE'] = [
         (function(_this) {
@@ -131,7 +132,9 @@
     };
 
     spinpolymer.prototype.setup = function() {
-      this.socket = io(this.dbUrl);
+      this.socket = io(this.dbUrl, {
+        source: this.dbUrl
+      });
       this.socket.on('connect', (function(_this) {
         return function() {
           return _this.emit({

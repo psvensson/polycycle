@@ -28,12 +28,25 @@
             is: 'spin-alltypes',
             properties:
             {
-                client:{type:'Object', notify: true},
+                client:{type:'Object', notify: true, observer: 'onClient'},
                 incallbacks:    {type: 'Object'},
                 spintype:{type:'Array'}
             },
 
-
+            onClient: function()
+            {
+                console.log('spin-alltypes onCLient called client = '+this.client)
+                if(this.client)
+                {
+                    console.dir(this.client)
+                    this.client.emitMessage({target: 'listTypes'}).then(function (types)
+                    {
+                        console.log('spin-alltypes got back')
+                        console.dir(types)
+                        this.set('spintypes', types)
+                    }.bind(this))
+                }
+            },
 
             ready: function()
            {
@@ -43,12 +56,7 @@
             attached: function()
               {
                   //console.log('spin-alltypes attached. model = '+this.model)
-                  this.client.emitMessage({target: 'listTypes'}).then(function (types)
-                  {
-                      //console.log('spin-alltypes got back')
-                      //console.dir(types)
-                      this.set('spintypes', types)
-                  }.bind(this))
+
               },
 
 

@@ -1,5 +1,6 @@
 {
   "name": "polymer-spincycle",
+  "version": "0.0.1",
   "description": "client and web components to communicate with and display lists and editors for any spincycle models",
   "main": "polymer-spincycle.html",
   "dependencies": {
