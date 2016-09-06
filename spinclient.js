@@ -104,7 +104,10 @@
     }
 
     spinpolymer.prototype.failed = function(msg) {
-      return console.log('spinclient message failed!! ' + msg);
+      console.log('spinclient message failed!! ' + msg);
+      if (this.onFailure) {
+        return this.onFailure(msg.info);
+      }
     };
 
     spinpolymer.prototype.setSessionId = function(id) {
@@ -132,8 +135,9 @@
     };
 
     spinpolymer.prototype.setup = function() {
+      console.log('..connecting to ' + this.dbUrl);
       this.socket = io(this.dbUrl, {
-        source: this.dbUrl
+        path: this.dbUrl + '/socket.io'
       });
       this.socket.on('connect', (function(_this) {
         return function() {
@@ -183,6 +187,9 @@
                       console.dir(reply);
                       _this.failure = true;
                       _this.failureMessage = reply.info;
+                      console.log('--- initial message was');
+                      console.dir(detail);
+                      _this.failed(reply);
                       detail.d.reject(reply);
                       break;
                     } else {
@@ -271,7 +278,6 @@
 
     spinpolymer.prototype.registerPopulationChangeSubscriber = function(detail) {
       var d, localsubs, sid;
-      console.log('registerPopulationChangeSubscriber called for ' + detail.type);
       d = $q.defer();
       sid = uuid.generate();
       localsubs = this.populationsubscribers[detail.type];

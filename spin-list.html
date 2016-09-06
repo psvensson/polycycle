@@ -1,9 +1,9 @@
 
-<link rel="import" href="./bower_components/polymer/polymer.html">
-<link rel="import" href="./bower_components/paper-listbox/paper-listbox.html">
-<link rel="import" href="./bower_components/paper-item/paper-item.html">
-<link rel="import" href="./bower_components/iron-icons/maps-icons.html">
-<link rel="import" href="./bower_components/iron-icons/iron-icons.html">
+<link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="../bower_components/paper-listbox/paper-listbox.html">
+<link rel="import" href="../bower_components/paper-item/paper-item.html">
+<link rel="import" href="../bower_components/iron-icons/maps-icons.html">
+<link rel="import" href="../bower_components/iron-icons/iron-icons.html">
 
 
 <dom-module id="spin-list">
@@ -34,9 +34,9 @@
             is: 'spin-list',
             properties:
             {
-                client:{type:'Object', notify: true},
-                model:          {type: 'String'},
-                propname:          {type: 'String'},
+                client:         {type:'Object', observer: 'onClient'},
+                model:          {type: 'String', observer: 'onModel'},
+                propname:       {type: 'String'},
                 delete:         {type: 'Boolean'},
                 spinitems:
                 {
@@ -44,15 +44,15 @@
                     value: function()
                     {
                         return [];
-                    },
-                    observer: 'onItemsChange'
+                    }
                 },
+                spinids:        {type: 'Array', observer:'onSpinIdsChange', notify:true},
                 incallbacks:    {type: 'Object'}
             },
 
             ready: function()
             {
-                console.log('*** spin-list ready. model = '+this.model)
+                //console.log('*** spin-list ready. model = '+this.model)
             },
 
             attached: function()
@@ -63,47 +63,70 @@
             onItemsChange: function(newitems)
             {
                 console.log('spin-list onItemChanged for "'+this.model+'"')
-                console.dir(arguments)
+                console.dir(newitems)
 
-                //this.set('spinitems', newitems)
-                //this.notifyPath('spinitems',this.spinitems)
-
-                if(newitems)
-                {
-                    newitems.forEach(function(item)
-                    {
-                        //this.push('spinitems', item)
-                        if(!this.listeners[item.id])
-                        {
-                            this.listeners[item.id] = item
-                            console.log('** spin-list for "'+this.model+'" registering for object change callback from server for '+item.name+' '+item.id)
-                            this.client.registerObjectSubscriber({ id: item.id, type: item.type, cb: function(newobj)
-                            {
-                                if(this.spinitems)
-                                {
-                                    console.log('#################### spin-list object change callback for ' + newobj.id)
-                                    console.dir(arguments)
-
-                                    for(var i = 0; i < this.spinitems.length; i++)
-                                    {
-                                        var ii = this.spinitems[i]
-                                        //console.log('comparing '+ii.id+' - '+newobj.id)
-                                        if(ii.id == newobj.id)
-                                        {
-                                            console.log('setting spinitem '+i)
-                                            this.set('spinitems.'+i+'', newobj)
-                                        }
-                                    }
-                                }
-                            }.bind(this)})
-                        }
-                        //this.$.listtemplate.render()
-                        //this.notifyPath('listitems',this.listitems)
-
-                    }.bind(this))
-                }
 
             },
+
+            onClient: function()
+                      {
+                        if(this.client)
+                        {
+                            this.onSpinIdsChange(this.spinids)
+                        }
+                      },
+
+            onModel: function()
+                     {
+                         if(this.client && this.model)
+                         {
+                             this.onSpinIdsChange(this.spinids)
+                         }
+                     },
+
+            onSpinIdsChange:function(newids, oldids)
+                            {
+                                if(this.model)
+                                {
+                                    console.log('onSpinIdsChange called newids. model is '+this.model)
+                                    console.dir(newids)
+                                    if(newids && (typeof newids != 'object' || !newids.length))
+                                    {
+                                        //throw('spin-list sent some strange stuff')
+                                        console.log('*** stringe stuff')
+                                    }
+                                    else if(this.spinids && this.client)
+                                    {
+                                        this.resolveArray(this.model,this.spinids).then(function(objarr)
+                                        {
+                                            this.set('spinitems', objarr)
+                                        }.bind(this))
+                                    }
+                                }
+                            },
+
+            resolveArray: function(type, _values)
+                          {
+                              return new Promise(function(fulfill)
+                              {
+                                  var objarr = []
+                                  //console.log('spin-list resolving objects for array of ids model = '+this.model)
+                                  //console.dir(_values)
+                                  var count = _values.length
+                                  _values.forEach(function(id)
+                                  {
+                                      this.client.emitMessage({target: '_get'+type, type: type, obj: {id: id, type: type}}).then(function(aobj)
+                                      {
+                                          //console.log('spin-list resolved '+aobj.type+' - '+aobj.name+' ['+aobj.id+']')
+                                          objarr.push(aobj)
+                                          if(--count === 0)
+                                          {
+                                              fulfill(objarr)
+                                          }
+                                      }.bind(this))
+                                  }.bind(this))
+                              }.bind(this))
+                          },
 
             onSelect: function(e)
             {

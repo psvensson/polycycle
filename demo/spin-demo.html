@@ -1,13 +1,21 @@
 
 <link rel="import" href="../bower_components/polymer/polymer.html">
 <link rel="import" href="../spin-alltypes.html">
+<link rel="import" href="../spin-allmodels.html">
 <link rel="import" href="../spin-client.html">
+<link rel="import" href="../spin-list.html">
+<link rel="import" href="../spin-model.html">
 
 <dom-module id="spin-demo">
 
     <template>
         <spin-client client="{{client}}" user="{{user}}"></spin-client>
-        <spin-alltypes client="{{client}}"></spin-alltypes>
+        <div style="display: flex;flex-direction:row">
+            <spin-alltypes client="{{client}}" incallbacks="{{alltypecallbacks}}" style="width:300px"></spin-alltypes>
+            <spin-allmodels client="{{client}}" incallbacks="{{allmodelcallbacks}}" model="{{selectedtype}}"></spin-allmodels>
+            <spin-model client="{{client}}" model="{{selectedmodel}}" style="width:500px"></spin-model>
+        </div>
+
     </template>
 
     <script>
@@ -16,7 +24,33 @@
             properties:
             {
                 client:{type:'Object', notify: true},
-                user:{type:'Object', notify: true}
+                user:{type:'Object', notify: true},
+                selectedtype:{type:'String', value:function(){ return 'SpinModule'}}
+            },
+
+            ready: function()
+            {
+                this.alltypecallbacks =
+                {
+                    onSelect: this.onSelect.bind(this)
+                }
+
+                this.allmodelcallbacks =
+                {
+                    onSelect: this.onSelectModel.bind(this)
+                }
+            },
+
+            onSelect: function(type)
+            {
+                console.log('spin-demo got onSelect for type')
+                console.dir(type)
+                this.set('selectedtype', type)
+            },
+
+            onSelectModel: function(model)
+            {
+                this.set('selectedmodel', model)
             }
         });
 

@@ -1,11 +1,10 @@
-<script src="./bower_components/uuid4/lib/browser/index.js"></script>
-<script src="./bower_components/lrucache/index.js"></script>
-<script src="./bower_components/q/q.js"></script>
-<script src="/socket.io/socket.io.js"></script>
-
+<script src="../bower_components/q/q.js"></script>
+<script src="../bower_components/uuid4/lib/browser/index.js"></script>
+<script src="../bower_components/lrucache/index.js"></script>
+<script src="../socket.io/socket.io.js"></script>
 <script src="spinclient.js"></script>
 
-<dom-module id="ge-login">
+<dom-module id="spin-client">
     <template>
         <style>
 
@@ -18,8 +17,10 @@
             is: 'spin-client',
             properties:
                 {
+                    path:{type:'String', value:function(){return ''}},
                     client:{type:'Object', notify: true},
-                    user: {type:'Object', notify: true, observer: 'onUserChanged'}
+                    user: {type:'Object', notify: true, observer: 'onUserChanged'},
+                    failure:{type:'String', notify:true}
                 },
 
             listeners:
@@ -36,12 +37,12 @@
             onUserChanged: function ( e )
                            {
                                //console.log( '********************* spin-client onUserChanged called.' )
-                               if(e.id)
+                               if(e && e.id)
                                {
                                    this.set('user', e)
                                    //console.dir(this.user)
                                    this.client.emitMessage( {
-                                       target: '_updateGEUser',
+                                       target: '_updateQPUser',
                                        obj:    this.user
                                    } ).then( function ( ures )
                                    {
@@ -53,12 +54,18 @@
 
             attached: function()
                       {
-                          console.log('spin-client attached')
-                          window.spinclient = new window.SpinClient('/')
+                          window.spinclient = new window.SpinClient(this.path)
+                          window.spinclient.setup()
                           console.log('spin-client attached.')
                           this.set('client', window.spinclient)
                           this.client.setUser = this.onUserChanged.bind( this )
+                          this.client.oNfailure = this.onFailure.bind(this)
                           this.addEventListener('user-changed', this.onUserChanged.bind(this))
+                      },
+
+            onFailure:function(ftext)
+                      {
+                          this.set('failure', ftext)
                       }
 
         });

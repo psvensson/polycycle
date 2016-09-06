@@ -1,6 +1,6 @@
 
-<link rel="import" href="./bower_components/polymer/polymer.html">
-<link rel="import" href="./bower_components/paper-button/paper-button.html">
+<link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="../bower_components/paper-button/paper-button.html">
 <link rel="import" href="./spin-list.html">
 
 <dom-module id="spin-allmodels">
@@ -29,7 +29,7 @@
             is: 'spin-allmodels',
             properties:
             {
-                client:{type:'Object', notify: true},
+                client:{type:'Object'},
                 model: {type: 'String', observer: 'onModelChange'},
                 incallbacks: {type: 'Object'}
             },
@@ -37,7 +37,7 @@
             ready: function()
             {
                 // set up defaults
-                this.itemsPerPage = 10
+                this.itemsPerPage = 20
                 this.listpages = []
                 this.currentPage = 0
                 this.outCallbacks =
@@ -58,7 +58,7 @@
 
             renderStuff: function()
              {
-                 if(this.client)
+                 if(this.client && this.model)
                  {
                      if(this.listenerid)
                      {
@@ -115,8 +115,8 @@
             drawQuickSelectBar: function()
                                 {
                 // Call count for model
-                                    console.log('drawQuickSelectbar. this is')
-                                    console.dir(this)
+                                    //console.log('drawQuickSelectbar. this is')
+                                    //console.dir(this)
                 this.client.emitMessage({target: '_count' + this.model + 's'}).then(function (count) {
                     //console.log('spin-allmodels count ' + this.model + ' got ' + count + ' back')
                     var pagecount = parseInt(count/this.itemsPerPage) + (count % parseInt(this.itemsPerPage/2) > 0 ? 1 : 0)
@@ -130,23 +130,31 @@
 
             fetchPage: function()
             {
-                console.log('------------------------------------- spin-allmodels fetchpage called')
-                var q = {property: this.searchPropName, value: this.searchpropVal, limit:this.itemsPerPage, skip: this.itemsPerPage*this.currentPage}
-                this.client.emitMessage({ target:'_list'+this.model+'s', query: q}).then(function(newlist)
+                if(this.model)
                 {
-                    //console.log('spin-allmodels fetchpage got '+newlist.length+' items back')
-                    //console.dir(newlist)
-                    if(!this.shownItems)
+                    //console.log('------------------------------------- spin-allmodels fetchpage called for '+this.model)
+                    var q = {property: this.searchPropName, value: this.searchpropVal, limit:this.itemsPerPage, skip: this.itemsPerPage*this.currentPage}
+                    this.client.emitMessage({ target:'_list'+this.model+'s', query: q}).then(function(newlist)
                     {
-                        this.shownItems = newlist
-                    }
-                    else
-                    {
-                        this.splice('shownItems', 0, this.shownItems.length)
-                        newlist.forEach(function(el){this.push('shownItems', el)}.bind(this))
-                        this.drawQuickSelectBar()
-                    }
-                }.bind(this))
+                        //console.log('spin-allmodels fetchpage got '+newlist.length+' items back')
+                        //console.dir(newlist)
+                        newlist.sort(function(a,b)
+                        {
+                            return a.name == b.name ? 0 : a.name < b.name ? -1 : 1
+                        })
+                        if(!this.shownItems)
+                        {
+                            this.shownItems = newlist
+                        }
+                        else
+                        {
+                            this.splice('shownItems', 0, this.shownItems.length)
+                            newlist.forEach(function(el){this.push('shownItems', el)}.bind(this))
+                            this.drawQuickSelectBar()
+                        }
+                    }.bind(this))
+                }
+
             },
 
             attached: function()

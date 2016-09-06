@@ -1,0 +1,202 @@
+
+<link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="../bower_components/paper-listbox/paper-listbox.html">
+<link rel="import" href="../bower_components/paper-item/paper-item.html">
+<link rel="import" href="../bower_components/iron-icons/maps-icons.html">
+<link rel="import" href="../bower_components/iron-icons/iron-icons.html">
+<link rel="import" href="../bower_components/paper-header-panel/paper-header-panel.html">
+<link rel="import" href="../bower_components/paper-toolbar/paper-toolbar.html">
+<link rel="import" href="../bower_components/paper-button/paper-button.html">
+<link rel="import" href="spin-client.html">
+
+<script src="//cdn.auth0.com/js/lock/10.0/lock.min.js"></script>
+
+<dom-module id="qp-login">
+    <template>
+        <style>
+            :host
+            {
+                color: #ddd;
+                font-size: 12px;
+            }
+            paper-button.fancy {
+
+                border: 2px solid ivory;
+                border-radius: 4px;
+                color: white;
+                font-size: 18px;
+                width: 100px;
+                /*height: 30px;*/
+                text-transform: none;
+                margin-bottom: 5px;
+                padding-left:5px;
+                box-shadow: 2px 2px 2px 1px rgba(0, 0, 0, 0.2);
+            }
+
+            paper-button.fancy:hover {
+                background: mediumaquamarine;
+            }
+        </style>
+
+        <spin-client client="{{client}}"></spin-client>
+
+        <div style="display:flex; flex-direction:row">
+            <template is="dom-if" if="{{user}}">
+                <div style="margin-top:25px">{{user.name}}</div>
+            </template>
+            <template is="dom-if" if="{{user.picture}}">
+                <img style="padding-left:5px;height:50px" src="{{user.picture}}">
+            </template>
+            <template is="dom-if" if="{{!user.picture}}">
+                <iron-icon style="padding: 10px" icon="icons:face"></iron-icon>
+            </template>
+            <paper-button style="" class="fancy" raised on-tap="onLoginOut">{{loginout}}</paper-button>
+        </div>
+    </template>
+
+    <script>
+        var AUTH0_KEY = 'BJkX0ggKriVT90x7if32wYifzbts3wyd'
+        var AUTH0_DOMAIN = 'qp1.eu.auth0.com'
+        Polymer({
+            is: 'qp-login',
+            properties:
+            {
+                client:{type:'Object', notify: true, observer:'onClient'},
+                user:{type:'Object', notify: true},
+                course:{type:'Object'},
+                gestorage: {type: 'Object'}.type,
+                reject: {type: Boolean, notify:true},
+                loggedin: {type: Boolean, notify:true}
+            },
+
+            ready: function()
+            {
+                //this.client = window.spinclient
+                this.reject = false
+                this.loginout = 'Log In'
+                this.loggedin = false
+                //console.log('qp-login ready')
+                this.lock = new Auth0Lock(
+                        AUTH0_KEY,
+                        AUTH0_DOMAIN
+                );
+
+                // Listening for the authenticated event
+               this.lock.on("authenticated", function(authResult) {
+                   // Use the token in authResult to getProfile() and save it to localStorage
+                   this.lock.getProfile(authResult.idToken, function(error, profile) {
+                       if (error) {
+                           // Handle error
+                           return;
+                       }
+
+                       console.log('** auth0 got profile')
+                       console.dir(profile)
+                       var token = authResult.accessToken
+                       console.log('--- sending access token '+token)
+                       this.client.emitMessage({ target:'login', access_token: token}).then(function(userObj)
+                       {
+                           console.log('* login result: '+userObj)
+                           console.dir(userObj)
+                           this.setUser(userObj)
+                       }.bind(this), function(reject)
+                       {
+                           console.log('qp-login reject from getCurrentUser')
+                           console.dir(reject)
+                           this.showSorryScreen()
+                       }.bind(this))
+                   }.bind(this));
+               }.bind(this));
+
+            },
+
+            onLoginOut: function()
+                     {
+                         if(this.loggedin)
+                         {
+                             this.set('gestorage', '')
+                             this.set('user', undefined)
+                             this.loginout = 'Log In'
+                             this.loggedin = false
+                         }
+                         else
+                         {
+                             this.lock.show()
+                         }
+                     },
+
+            showSorryScreen: function()
+                             {
+                                console.log('qp-login --- server has rejected user. Show sorry screen')
+                                 console.dir(this)
+                                this.fire('iron-select','sorry')
+                                this.fire('reject-changed', true)
+                                 this.set('reject', true)
+                             },
+
+            setUser: function(userObj)
+                     {
+                         console.log('qp-login --- setUser called')
+                         this.set('user', userObj)
+                         this.client.setUser(userObj)
+                         this.loginout = 'Log Out'
+                         this.loggedin = true
+                         this.reject = false
+                         var str = sessionStorage.getItem('gestorage') || '{}'
+                         var storage = JSON.parse(str)
+                         storage.sessionId = userObj.sessionId
+                         sessionStorage.setItem('gestorage', JSON.stringify(storage))
+                         this.set('gestorage', storage)
+                         this.client.setSessionId(userObj.sessionId)
+                     },
+
+            getCurrentUserFromSessionId: function(sid)
+            {
+                console.log('qp-login calling getCurrentUserFromsessionId')
+                this.client.emitMessage({ target:'getUserFromSessionId', sessionId:sid}).then(function(userObj)
+                {
+                    //console.log('******************************************************* qp-login got user from sessionId')
+                    //console.dir(userObj)
+                    this.setUser(userObj)
+                    //this.set('client', this.client)
+                    console.log('qp-login getCurrentUserFromsessionId user is now--------------------------------')
+                    console.dir(this.user)
+                }.bind(this), function(reject)
+                {
+                    console.log('qp-login getCurrentUserFromsessionId got reject: '+reject)
+                    sessionStorage.setItem('gestorage', JSON.stringify({sessionId: undefined}))
+                    this.showSorryScreen()
+                }.bind(this))
+            },
+
+            attached: function()
+            {
+                //console.log('qp-login attached.')
+            },
+
+            onClient: function()
+                      {
+                          console.log('......... qp-login onClient called')
+                          var str = sessionStorage.getItem('gestorage') || '{}'
+                          var storage = JSON.parse(str)
+                          var sid = undefined
+                          if(storage)
+                          {
+                              sid = storage.sessionId
+                              console.log('qp-login -- stored sid = '+sid)
+                              this.client.setSessionId(sid)
+                          }
+                          if(!this.user)
+                          {
+                              if(sid)
+                              {
+                                  this.getCurrentUserFromSessionId(sid)
+                              }
+                          }
+                      }
+
+        });
+
+    </script>
+
+</dom-module>

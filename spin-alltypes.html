@@ -1,9 +1,9 @@
 
-<link rel="import" href="./bower_components/polymer/polymer.html">
-<link rel="import" href="./bower_components/paper-listbox/paper-listbox.html">
-<link rel="import" href="./bower_components/paper-item/paper-item.html">
-<link rel="import" href="./bower_components/iron-icons/maps-icons.html">
-<link rel="import" href="./bower_components/iron-icons/iron-icons.html">
+<link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="../bower_components/paper-listbox/paper-listbox.html">
+<link rel="import" href="../bower_components/paper-item/paper-item.html">
+<link rel="import" href="../bower_components/iron-icons/maps-icons.html">
+<link rel="import" href="../bower_components/iron-icons/iron-icons.html">
 
 
 <dom-module id="spin-alltypes">
@@ -28,25 +28,12 @@
             is: 'spin-alltypes',
             properties:
             {
-                client:{type:'Object', notify: true, observer: 'onClient'},
+                client:{type:'Object'},
                 incallbacks:    {type: 'Object'},
                 spintype:{type:'Array'}
             },
 
-            onClient: function()
-            {
-                console.log('spin-alltypes onCLient called client = '+this.client)
-                if(this.client)
-                {
-                    console.dir(this.client)
-                    this.client.emitMessage({target: 'listTypes'}).then(function (types)
-                    {
-                        console.log('spin-alltypes got back')
-                        console.dir(types)
-                        this.set('spintypes', types)
-                    }.bind(this))
-                }
-            },
+
 
             ready: function()
            {
@@ -56,7 +43,12 @@
             attached: function()
               {
                   //console.log('spin-alltypes attached. model = '+this.model)
-
+                  this.client.emitMessage({target: 'listTypes'}).then(function (types)
+                  {
+                      //console.log('spin-alltypes got back')
+                      //console.dir(types)
+                      this.set('spintypes', types)
+                  }.bind(this))
               },
 
 

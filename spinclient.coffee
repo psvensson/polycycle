@@ -41,7 +41,7 @@ class spinpolymer
       #console.dir(@objsubscribers)
       objsubs = @objsubscribers[obj.id] or []
       for k,v of objsubs
-        #console.log 'updating subscriber to @objects updates on id '+k
+#console.log 'updating subscriber to @objects updates on id '+k
         if not @objects.get(obj.id)
           @objects.set(obj.id, obj)
         else
@@ -65,6 +65,7 @@ class spinpolymer
 
   failed: (msg)->
     console.log 'spinclient message failed!! ' + msg
+    if @onFailure then @onFailure msg.info
 
   setSessionId: (id) ->
     if(id)
@@ -87,8 +88,8 @@ class spinpolymer
     @socket.emit('message', JSON.stringify(message))
 
   setup: () =>
-
-    @socket = io(@dbUrl, {source:@dbUrl})
+    console.log '..connecting to '+@dbUrl
+    @socket = io(@dbUrl,{path: @dbUrl+'/socket.io'})
     @socket.on 'connect', ()=>
       @emit({target:'listcommands'})
 
@@ -136,6 +137,9 @@ class spinpolymer
                   console.dir reply
                   @failure = true
                   @failureMessage = reply.info
+                  console.log '--- initial message was'
+                  console.dir detail
+                  @failed(reply)
                   detail.d.reject reply
                   break
                 else
@@ -189,26 +193,28 @@ class spinpolymer
 
 
   registerPopulationChangeSubscriber: (detail) =>
-    console.log 'registerPopulationChangeSubscriber called for '+detail.type
+    #console.log 'registerPopulationChangeSubscriber called for '+detail.type
     d = $q.defer()
     sid = uuid.generate()
     localsubs = @populationsubscribers[detail.type]
     if not localsubs
       localsubs = {}
-      @_registerPopulationSubscriber({
-         type: detail.type, cb: (updatedobj) =>
-          lsubs = @populationsubscribers[detail.type]
-          for k,v of lsubs
-            if (v.cb)
-              v.cb updatedobj
-      }).then( (remotesid) =>
-        localsubs['remotesid'] = remotesid
-        localsubs[sid] = detail
-        @populationsubscribers[detail.type] = localsubs
-        d.resolve(sid)
-      ,(rejection)=>
-        console.log 'spinpolymer registerPopulationSubscriber rejection: '+rejection
-        console.dir rejection
+      @_registerPopulationSubscriber(
+        {
+          type: detail.type
+          cb: (updatedobj) =>
+            lsubs = @populationsubscribers[detail.type]
+            for k,v of lsubs
+              if (v.cb)
+                v.cb updatedobj
+        }).then( (remotesid) =>
+          localsubs['remotesid'] = remotesid
+          localsubs[sid] = detail
+          @populationsubscribers[detail.type] = localsubs
+          d.resolve(sid)
+        ,(rejection)=>
+          console.log 'spinpolymer registerPopulationSubscriber rejection: '+rejection
+          console.dir rejection
       )
     else
       localsubs[sid] = detail
@@ -217,7 +223,8 @@ class spinpolymer
   _registerPopulationSubscriber: (detail) =>
     d = $q.defer()
     subs = @popsubscribers[detail.type] or {}
-    @emitMessage({target: 'registerForPopulationChangesFor',  type: detail.type}).then(
+    #console.log '_registerPopulationChangeSubscriber called for '+detail.type
+    @emitMessage({target: 'registerForPopulationChangesFor', type: detail.type}).then(
       (reply)=>
         subs[reply] = detail.cb
         @popsubscribers[detail.type] = subs
@@ -291,6 +298,7 @@ class spinpolymer
     detail.messageId = uuid.generate()
     detail.sessionId = detail.sessionId or @sessionId
     detail.d = d
+    #console.log '------------------> EmitMessage sessionId = '+detail.sessionId
     @outstandingMessages.push detail
     #if debug then console.log 'saving outstanding reply to messageId ' + detail.messageId + ' and @sessionId ' + detail.sessionId
     @emit detail
