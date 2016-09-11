@@ -7,6 +7,7 @@ FooThing        = require('./FooThing')
 
 class SampleGame extends SuperModel
 
+
   @type       = 'SampleGame'
   @model =
     [
@@ -18,7 +19,7 @@ class SampleGame extends SuperModel
     return super
 
   postCreate: (q) =>
-    console.log 'players.length == '+@players.length
+    console.log 'players.length  == '+@players.length
     #console.dir @
     if @players.length == 0
       @createPlayers().then () =>

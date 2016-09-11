@@ -1,0 +1,23 @@
+{
+  "name": "polycycle",
+  "version": "1.0.0",
+  "description": "A polymer version of the Spincycle ORM client with custom elements for generic listing and editing for any model(s)",
+  "main": "AuthenticationManager.js",
+  "dependencies": {
+    "spincycle": "^1.8.64"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/psvensson/polycycle.git"
+  },
+  "author": "",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/psvensson/polycycle/issues"
+  },
+  "homepage": "https://github.com/psvensson/polycycle#readme"
+}

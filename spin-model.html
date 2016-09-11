@@ -65,7 +65,7 @@
             properties:
             {
                 client:{type:'Object'},
-                model:          {type: 'Object',  notify:true, value: function() {return new Object()} },
+                model:          {type: 'Object',  notify:true, value: function() {return new Object()}, observer: 'onModelChanged' },
                 modelproperties: {type: 'Array', observer: '_onArray'},
                 incallbacks:    {type: 'Object'},
                 readonlyproperties: {type: 'Array', value: ['id']}
