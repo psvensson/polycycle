@@ -47,7 +47,7 @@
                     }
                 },
                 spinids:        {type: 'Array', observer:'onSpinIdsChange', notify:true},
-                incallbacks:    {type: 'Object'}
+                itemselected:   {type: 'Object', notify:true}
             },
 
             ready: function()
@@ -60,13 +60,7 @@
                 this.listeners = {}
             },
 
-            onItemsChange: function(newitems)
-            {
-                console.log('spin-list onItemChanged for "'+this.model+'"')
-                console.dir(newitems)
 
-
-            },
 
             onClient: function()
                       {
@@ -130,12 +124,10 @@
 
             onSelect: function(e)
             {
-                //console.log('onSelect called at spin-list')
+                console.log('onSelect called at spin-list')
+                console.dir(e)
                 var item = e.model.item
-                if(this.incallbacks && this.incallbacks.onSelect)
-                {
-                    this.incallbacks.onSelect(item)
-                }
+                this.set('itemselected', item)
             },
 
             onDelete:function(e)

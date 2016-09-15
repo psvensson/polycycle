@@ -12,7 +12,7 @@
         <spin-client client="{{client}}" user="{{user}}"></spin-client>
         <div style="display: flex;flex-direction:row">
             <spin-alltypes client="{{client}}" incallbacks="{{alltypecallbacks}}" style="width:300px"></spin-alltypes>
-            <spin-allmodels client="{{client}}" incallbacks="{{allmodelcallbacks}}" model="{{selectedtype}}"></spin-allmodels>
+            <spin-allmodels client="{{client}}" incallbacks="{{allmodelcallbacks}}" model="{{selectedtype}}" itemselected="{{itemselected}}"> </spin-allmodels>
             <spin-model client="{{client}}" model="{{selectedmodel}}" modelproperties="{{selectedmodelproperties}}" style="width:500px"></spin-model>
         </div>
 
@@ -25,7 +25,7 @@
             {
                 client:{type:'Object', notify: true},
                 user:{type:'Object', notify: true},
-                selectedtype:{type:'String', value:function(){ return 'SpinModule'}}
+                itemselected:{type:'Object', observer: 'onItemSelected'}
             },
 
             ready: function()
@@ -37,7 +37,7 @@
 
                 this.allmodelcallbacks =
                 {
-                    onSelect: this.onSelectModel.bind(this)
+                    //onSelect: this.onSelectModel.bind(this)
                 }
             },
 
@@ -48,7 +48,7 @@
                 this.set('selectedtype', type)
             },
 
-            onSelectModel: function(model)
+            onItemSelected: function(model)
             {
                 console.log('spin-demo got selected model')
                 console.dir(model)

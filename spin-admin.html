@@ -67,7 +67,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                     <spin-alltypes client="{{client}}" style="padding:20px" incallbacks="{{typeSelectCallbacks}}"></spin-alltypes>
                     <div style="display:flex; flex-direction: row">
                         <template is="dom-if" if="{{selectedType}}">
-                            <spin-allmodels client="{{client}}" style="padding:20px" incallbacks="{{outCallbacks}}" model="{{selectedType}}"></spin-allmodels>
+                            <spin-allmodels client="{{client}}" style="padding:20px" itemselected="{{itemselected}}" incallbacks="{{outCallbacks}}" model="{{selectedType}}"></spin-allmodels>
                             <spin-model client="{{client}}" style="padding:20px"  model="{{selectedmodel}}" modelproperties="{{selectedmodelproperties}}"></spin-model>
                         </template>
                     </div>
@@ -96,7 +96,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 client:{type:'Object', notify: true, observer: 'onClientChanged'},
                 user:{type:'Object', notify: true},
                 reject:{type: Boolean, notify:true},
-                loggedin:{type: Boolean, notify:true}
+                loggedin:{type: Boolean, notify:true},
+                itemselected:{type:'Object', observer:'onItemSelected'}
             },
 
             listeners:
@@ -166,6 +167,12 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                           //console.log('spin-admin attached')
                           //console.dir(this.client)
                       },
+
+            onItemSelected:function(e)
+            {
+              console.log('spin-admin.onItemSelected called')
+                console.dir(e)
+            },
 
             onSelect: function(item)
                       {
