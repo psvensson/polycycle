@@ -1,17 +1,24 @@
-Game  = require('./SampleGame')
-DB    = require('spincycle').DB
+SampleGame      =  require('./SampleGame')
+SamplePlayer    = require('./SamplePlayer')
+FooThing        = require('./FooThing')
+DB              = require('spincycle').DB
+ResolveModule   = require('spincycle').ResolveModule
 
 class SampleLogic
 
-  @gamecount = 0
-
   constructor: (@messageRouter) ->
-    @games = []
-    DB.createDatabases(['samplegame', 'sampleplayer']).then (results)=>
+
+    @messageRouter.objectManager.expose('SampleGame')
+    @messageRouter.objectManager.expose('SamplePlayer')
+    @messageRouter.objectManager.expose('FooThing')
+
+    ResolveModule.modulecache['SampleGame'] = SampleGame
+    ResolveModule.modulecache['SamplePlayer'] = SamplePlayer
+    ResolveModule.modulecache['FooThing'] = FooThing
+
+    DB.createDatabases(['SampleGame', 'SamplePlayer', 'FooThing']).then (results)=>
       console.log ' DB init done..'
-      @messageRouter.objectManager.expose('SampleGame')
-      @messageRouter.objectManager.expose('SamplePlayer')
-      @messageRouter.objectManager.expose('FooThing')
+
       DB.getOrCreateObjectByRecord({id:17, name: 'fooGame', type: 'SampleGame', createdBy: 'SYSTEM', createdAt: Date.now()}).then (game)=>
         console.log 'got first game'
         game.serialize()

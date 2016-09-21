@@ -100,6 +100,7 @@
                  {
                      this.client.emitMessage({target: 'getModelFor', modelname: this.model}).then(function(mprops)
                      {
+                         mprops.push({name:'id'})
                          this.set('modelproperties', mprops)
                      }.bind(this))
                      if(this.listenerid)
@@ -175,7 +176,7 @@
                 if(this.model)
                 {
                     //console.log('------------------------------------- spin-allmodels fetchpage called for '+this.model)
-                    var q = {property: this.searchproperty, value: this.searchvalue, limit:this.itemsPerPage, skip: this.itemsPerPage*this.currentPage}
+                    var q = {property: this.searchproperty, wildcard:true, value: this.searchvalue, limit:this.itemsPerPage, skip: this.itemsPerPage*this.currentPage}
                     this.client.emitMessage({ target:'_list'+this.model+'s', query: q}).then(function(newlist)
                     {
                         //console.log('spin-allmodels fetchpage got '+newlist.length+' items back')
