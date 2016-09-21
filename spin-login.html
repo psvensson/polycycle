@@ -11,7 +11,7 @@
 
 <script src="//cdn.auth0.com/js/lock/10.0/lock.min.js"></script>
 
-<dom-module id="qp-login">
+<dom-module id="spin-login">
     <template>
         <style>
             :host
@@ -58,7 +58,7 @@
         var AUTH0_KEY = 'xxxxxxxxx'
         var AUTH0_DOMAIN = 'yyyyyyyyy'
         Polymer({
-            is: 'qp-login',
+            is: 'spin-login',
             properties:
             {
                 client:{type:'Object', notify: true, observer:'onClient'},
@@ -75,7 +75,7 @@
                 this.reject = false
                 this.loginout = 'Log In'
                 this.loggedin = false
-                //console.log('qp-login ready')
+                //console.log('spin-login ready')
                 this.lock = new Auth0Lock(
                         AUTH0_KEY,
                         AUTH0_DOMAIN
@@ -101,7 +101,7 @@
                            this.setUser(userObj)
                        }.bind(this), function(reject)
                        {
-                           console.log('qp-login reject from getCurrentUser')
+                           console.log('spin-login reject from getCurrentUser')
                            console.dir(reject)
                            this.showSorryScreen()
                        }.bind(this))
@@ -127,7 +127,7 @@
 
             showSorryScreen: function()
                              {
-                                console.log('qp-login --- server has rejected user. Show sorry screen')
+                                console.log('spin-login --- server has rejected user. Show sorry screen')
                                  console.dir(this)
                                 this.fire('iron-select','sorry')
                                 this.fire('reject-changed', true)
@@ -136,7 +136,7 @@
 
             setUser: function(userObj)
                      {
-                         console.log('qp-login --- setUser called')
+                         console.log('spin-login --- setUser called')
                          this.set('user', userObj)
                          this.client.setUser(userObj)
                          this.loginout = 'Log Out'
@@ -152,18 +152,18 @@
 
             getCurrentUserFromSessionId: function(sid)
             {
-                console.log('qp-login calling getCurrentUserFromsessionId')
+                console.log('spin-login calling getCurrentUserFromsessionId')
                 this.client.emitMessage({ target:'getUserFromSessionId', sessionId:sid}).then(function(userObj)
                 {
-                    //console.log('******************************************************* qp-login got user from sessionId')
+                    //console.log('******************************************************* spin-login got user from sessionId')
                     //console.dir(userObj)
                     this.setUser(userObj)
                     //this.set('client', this.client)
-                    console.log('qp-login getCurrentUserFromsessionId user is now--------------------------------')
+                    console.log('spin-login getCurrentUserFromsessionId user is now--------------------------------')
                     console.dir(this.user)
                 }.bind(this), function(reject)
                 {
-                    console.log('qp-login getCurrentUserFromsessionId got reject: '+reject)
+                    console.log('spin-login getCurrentUserFromsessionId got reject: '+reject)
                     sessionStorage.setItem('gestorage', JSON.stringify({sessionId: undefined}))
                     this.showSorryScreen()
                 }.bind(this))
@@ -171,19 +171,19 @@
 
             attached: function()
             {
-                //console.log('qp-login attached.')
+                //console.log('spin-login attached.')
             },
 
             onClient: function()
                       {
-                          console.log('......... qp-login onClient called')
+                          console.log('......... spin-login onClient called')
                           var str = sessionStorage.getItem('gestorage') || '{}'
                           var storage = JSON.parse(str)
                           var sid = undefined
                           if(storage)
                           {
                               sid = storage.sessionId
-                              console.log('qp-login -- stored sid = '+sid)
+                              console.log('spin-login -- stored sid = '+sid)
                               this.client.setSessionId(sid)
                           }
                           if(!this.user)
