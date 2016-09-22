@@ -1,0 +1,101 @@
+
+<link rel="import" href="./bower_components/polymer/polymer.html">
+<link rel="import" href="./bower_components/paper-listbox/paper-listbox.html">
+<link rel="import" href="./bower_components/paper-item/paper-item.html">
+<link rel="import" href="./bower_components/iron-icons/maps-icons.html">
+<link rel="import" href="./bower_components/iron-icons/iron-icons.html">
+
+<link rel="import" href="./spin-model.html">
+
+<dom-module id="spin-explorer">
+
+    <template>
+
+        <style>
+
+        </style>
+
+        <div>
+            <h4>Spin Explorer</h4>
+            <paper-listbox>
+                <paper-item>
+                    <template is="dom-repeat" items="{{breadcrumbs}}">
+                        <span on-tap="onClickBreadcrumb">{{item.name}} &gt; </span>
+                    </template>
+                </paper-item>
+                <spin-model client="{{client}}" style="padding:20px" selectedlistitem="{{selectedlistitem}}" model="{{model}}" modelproperties="{{modelproperties}}"></spin-model>
+            </paper-listbox>
+        </div>
+    </template>
+
+    <script>
+        Polymer({
+            is: 'spin-explorer',
+            properties:
+            {
+                client:         {type:'Object', observer: 'onClient'},
+                model:          {type: 'Object', observer: 'onModel'},
+                modelproperties: {type: 'Array'},
+                breadcrumbs:
+                {
+                    type: 'Array',
+                    value: function()
+                    {
+                        return [];
+                    }
+                },
+                selectedlistitem:{type:'Object', observer:'onSelectedListItem'}
+            },
+
+            onClickBreadcrumb: function(bc)
+            {
+                console.log('onClickBreadcrumb called')
+                console.dir(bc)
+
+            },
+
+            onSelectedListItem: function(item)
+            {
+                console.log('spin-explorer onSelectedListitem called')
+                console.dir(item)
+
+            },
+
+            ready: function()
+            {
+                //console.log('*** spin-explorer ready. model = '+this.model)
+            },
+
+            attached: function()
+            {
+                this.listeners = {}
+            },
+
+            onClient: function()
+                      {
+                        if(this.client)
+                        {
+
+                        }
+                      },
+
+            onModel: function()
+                     {
+                         /*
+                         if(this.client && this.model)
+                         {
+                             this.client.emitMessage({target: 'getModelFor', modelname: this.model.type}).then(function(mprops)
+                             {
+                                 console.log('setting modelprops to')
+                                 console.dir(mprops)
+                                 this.set('modelproperties', mprops)
+                                 //this.set('model', item)
+                             }.bind(this))
+                         }
+                         */
+                     }
+        });
+
+    </script>
+
+</dom-module>

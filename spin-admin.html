@@ -8,13 +8,13 @@ Code distributed by Google as part of the polymer project is also
 subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
 -->
 
-<link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="./bower_components/polymer/polymer.html">
 <link rel="import" href="spin-allmodels.html">
 <link rel="import" href="spin-alltypes.html">
 <link rel="import" href="spin-model.html">
-<link rel="import" href="ge-navigation.html">
 <link rel="import" href="spin-client.html">
-<link rel="import" href="ge-login.html">
+<link rel="import" href="spin-login.html">
+<link rel="import" href="spin-explorer.html">
 
 <dom-module id="spin-admin">
 
@@ -68,7 +68,11 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                     <div style="display:flex; flex-direction: row">
                         <template is="dom-if" if="{{selectedType}}">
                             <spin-allmodels client="{{client}}" style="padding:20px" itemselected="{{itemselected}}" incallbacks="{{outCallbacks}}" model="{{selectedType}}"></spin-allmodels>
+                            <!--
                             <spin-model client="{{client}}" style="padding:20px"  model="{{selectedmodel}}" modelproperties="{{selectedmodelproperties}}"></spin-model>
+                            -->
+                            FOO
+                            <spin-explorer model="{{selectedmodel}}" modelproperties="{{selectedmodelproperties}}"></spin-explorer>
                         </template>
                     </div>
                 </template>

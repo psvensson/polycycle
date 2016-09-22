@@ -31,7 +31,7 @@
                     <div style="display:flex; flex-direction:row">
                         <paper-item >
                             <template is="dom-if" if="{{isType(item,'array')}}">
-                                <spin-list propname="{{item.key}}" delete="true" incallbacks="[[outCallbacks]]" client="{{client}}" user="{{user}}" model="{{getTypeFor(item)}}" spinids="{{item.value}}"></spin-list>
+                                <spin-list propname="{{item.key}}" delete="true" incallbacks="[[outCallbacks]]" client="{{client}}" user="{{user}}" model="{{getTypeFor(item)}}" spinids="{{item.value}}" itemselected="{{selectedlistitem}}"></spin-list>
                                 <paper-button raised on-tap="addModel">Add {{getTypeFor(item)}}</paper-button>
                                 <paper-dialog style="padding:20px;overflow:auto"  id="addmodeldialog_{{getModelId()}}_{{getTypeFor(item)}}">
                                     <h2>Add {{item.type}}</h2>
@@ -68,6 +68,7 @@
                 model:          {type: 'Object',  notify:true, value: function() {return new Object()}, observer: 'onModelChanged' },
                 modelproperties: {type: 'Array', observer: '_onArray'},
                 incallbacks:    {type: 'Object'},
+                selectedlistitem:{typ:'Object', notify:true, observer:'onListItemSelect'},
                 readonlyproperties: {type: 'Array', value: ['id']}
             },
 
@@ -91,6 +92,13 @@
                           //console.log("test._onArray", change.path);
                           //console.dir(change)
                       },
+
+            onListItemSelect: function(item)
+            {
+                console.log('onListitemSelected')
+                console.dir(item)
+
+            },
 
             onInputChange:function(e)
                           {
@@ -305,6 +313,7 @@
                 {
                     this.incallbacks.onSelect(item)
                 }
+                this.set('selectedlistitem', item)
             },
 
             onDelete:function(e)
