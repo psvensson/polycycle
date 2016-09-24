@@ -1,4 +1,3 @@
-
 <link rel="import" href="./bower_components/polymer/polymer.html">
 <link rel="import" href="./bower_components/paper-listbox/paper-listbox.html">
 <link rel="import" href="./bower_components/paper-item/paper-item.html">
@@ -20,81 +19,102 @@
             <paper-listbox>
                 <paper-item>
                     <template is="dom-repeat" items="{{breadcrumbs}}">
-                        <span on-tap="onClickBreadcrumb">{{item.name}} &gt; </span>
+                        <span on-tap="onClickBreadcrumb">{{item.name}} &gt;&nbsp; </span>
                     </template>
                 </paper-item>
-                <spin-model client="{{client}}" style="padding:20px" selectedlistitem="{{selectedlistitem}}" model="{{model}}" modelproperties="{{modelproperties}}"></spin-model>
+                <spin-model client="{{client}}" style="padding:20px" selectedlistitem="{{selectedlistitem}}"
+                            model="{{selectedmodel}}" modelproperties="{{modelproperties}}"></spin-model>
             </paper-listbox>
         </div>
     </template>
 
     <script>
-        Polymer({
-            is: 'spin-explorer',
-            properties:
-            {
-                client:         {type:'Object', observer: 'onClient'},
-                model:          {type: 'Object', observer: 'onModel'},
-                modelproperties: {type: 'Array'},
-                breadcrumbs:
-                {
-                    type: 'Array',
-                    value: function()
-                    {
-                        return [];
-                    }
+        Polymer( {
+            is:         'spin-explorer',
+            properties: {
+                client:           {type: 'Object', observer: 'onClient'},
+                model:            {type: 'Object', observer: 'onModel'},
+                modelproperties:  {type: 'Array'},
+                breadcrumbs:      {
+                    type:  'Array',
+                    value: function ()
+                           {
+                               return [];
+                           }
                 },
-                selectedlistitem:{type:'Object', observer:'onSelectedListItem'}
+                selectedlistitem: {type: 'Object', observer: 'onSelectedListItem'}
             },
 
-            onClickBreadcrumb: function(bc)
-            {
-                console.log('onClickBreadcrumb called')
-                console.dir(bc)
+            onClickBreadcrumb: function ( e )
+                               {
+                                   var bc = e.model.item
+                                   if(bc.id != this.selectedmodel.id)
+                                   {
+                                       console.log( 'onClickBreadcrumb called' )
+                                       console.dir( bc )
+                                       this.cutBreadCrumbsAt( bc )
+                                       this.set( 'selectedmodel', bc )
+                                   }
+                               },
 
-            },
+            cutBreadCrumbsAt: function ( item )
+                              {
+                                  console.log('------------------------------------ breadcrumbs before')
+                                  console.dir(this.breadcrumbs)
+                                    var idx = -1
+                                    this.breadcrumbs.forEach(function(bc, i)
+                                    {
+                                        if(item.id == bc.id)
+                                        {
+                                            idx = i
+                                        }
+                                    })
+                                  if(idx > -1 && idx+1 < this.breadcrumbs.length)
+                                  {
+                                      console.log('cuttingbreadcrumbs at index '+idx)
+                                      this.splice('breadcrumbs',idx+1,1)
+                                  }
+                                  console.log('breadcrumbs after')
+                                  console.dir(this.breadcrumbs)
+                              },
 
-            onSelectedListItem: function(item)
-            {
-                console.log('spin-explorer onSelectedListitem called')
-                console.dir(item)
+            onSelectedListItem: function ( item )
+                                {
+                                    console.log( 'spin-explorer onSelectedListitem called' )
+                                    console.dir( item )
+                                    this.set( 'selectedmodel', item )
+                                    this.push('breadcrumbs', item)
+                                },
 
-            },
+            ready: function ()
+                   {
+                       //console.log('*** spin-explorer ready. model = '+this.model)
+                   },
 
-            ready: function()
-            {
-                //console.log('*** spin-explorer ready. model = '+this.model)
-            },
-
-            attached: function()
-            {
-                this.listeners = {}
-            },
-
-            onClient: function()
+            attached: function ()
                       {
-                        if(this.client)
-                        {
-
-                        }
+                          this.listeners = {}
                       },
 
-            onModel: function()
+            onClient: function ()
+                      {
+                          if (this.client)
+                          {
+
+                          }
+                      },
+
+            onModel: function ()
                      {
-                         /*
-                         if(this.client && this.model)
+                         console.log( 'spin-explorer ****************************************************** onModel')
+                         if (this.model)
                          {
-                             this.client.emitMessage({target: 'getModelFor', modelname: this.model.type}).then(function(mprops)
-                             {
-                                 console.log('setting modelprops to')
-                                 console.dir(mprops)
-                                 this.set('modelproperties', mprops)
-                                 //this.set('model', item)
-                             }.bind(this))
+                             this.set( 'breadcrumbs', [ this.model ] )
+                             this.set( 'selectedmodel', this.model )
                          }
-                         */
+
                      }
-        });
+        } );
 
     </script>
 

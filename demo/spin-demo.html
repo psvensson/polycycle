@@ -10,16 +10,14 @@
 <dom-module id="spin-demo">
 
     <template>
-        <spin-client client="{{client}}" user="{{user}}"></spin-client>
-        <div style="display: flex;flex-direction:row">
-            <spin-alltypes client="{{client}}" incallbacks="{{alltypecallbacks}}" style="width:300px"></spin-alltypes>
-            <spin-allmodels client="{{client}}" incallbacks="{{allmodelcallbacks}}" model="{{selectedtype}}" itemselected="{{itemselected}}"> </spin-allmodels>
-            <!--
-            <spin-model client="{{client}}" model="{{selectedmodel}}" modelproperties="{{selectedmodelproperties}}" style="width:500px"></spin-model>
-            -->
-            <spin-explorer client="{{client}}" model="{{selectedmodel}}" modelproperties="{{selectedmodelproperties}}"></spin-explorer>
+        <div style="width:100%">
+            <spin-client client="{{client}}" user="{{user}}"></spin-client>
+            <div style="display: flex;flex-direction:row">
+                <spin-alltypes style="padding:20px;border-right:1px solid gray" client="{{client}}" incallbacks="{{alltypecallbacks}}" style="width:300px"></spin-alltypes>
+                <spin-allmodels style="padding:20px;width:300px;border-right:1px solid gray" client="{{client}}" incallbacks="{{allmodelcallbacks}}" model="{{selectedtype}}" itemselected="{{itemselected}}"> </spin-allmodels>
+                <spin-explorer style="padding:20px;border-right:1px solid gray" client="{{client}}" model="{{selectedmodel}}" modelproperties="{{selectedmodelproperties}}"></spin-explorer>
+            </div>
         </div>
-
     </template>
 
     <script>
